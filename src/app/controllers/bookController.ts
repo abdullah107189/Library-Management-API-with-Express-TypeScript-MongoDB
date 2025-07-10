@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import { Books } from "../models/bookModel";
 export const bookRouter = express.Router();
 
+// crate book route
 bookRouter.post("/", async (req: Request, res: Response) => {
   try {
     const body = req.body;
@@ -20,6 +21,43 @@ bookRouter.post("/", async (req: Request, res: Response) => {
     });
   }
 });
-bookRouter.get("/", async (req: Request, res: Response) => {});
+
+// find book route
+bookRouter.get("/", async (req: Request, res: Response) => {
+  try {
+    const query = req.query;
+    const filter = query.filter as string;
+    const filterObj = filter ? { genre: filter } : {};
+
+    const rawSortBy = query.sortBy as string;
+    let sortBy = rawSortBy || "createdAt";
+    const rawSort = query.sort as string;
+    const sortValue = rawSort === "desc" ? -1 : 1;
+
+    const rawLimit = query.limit as string;
+    const limitNumber = Number(rawLimit);
+
+
+    const result = await Books.find(filterObj)
+      .sort({ [sortBy]: sortValue })
+      .limit(limitNumber);
+
+    res.status(200).json({
+      success: true,
+      message: "Books retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Fetching books failed",
+      error: error,
+    });
+  }
+});
+
+// update book route
 bookRouter.patch("/", async (req: Request, res: Response) => {});
+
+// delete book route
 bookRouter.delete("/", async (req: Request, res: Response) => {});
