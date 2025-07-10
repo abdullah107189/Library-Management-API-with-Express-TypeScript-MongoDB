@@ -74,7 +74,24 @@ bookRouter.get("/:bookId", async (req: Request, res: Response) => {
 });
 
 // update book route
-bookRouter.patch("/", async (req: Request, res: Response) => {});
+bookRouter.patch("/:bookId", async (req: Request, res: Response) => {
+  try {
+    const { bookId } = req.params;
+    const update = req.body;
+    const result = await Books.findByIdAndUpdate(bookId, update, { new: true });
+    res.status(200).json({
+      success: true,
+      message: "Book updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Failed to update book",
+      error: (error as Error).message,
+    });
+  }
+});
 
 // delete book route
 bookRouter.delete("/", async (req: Request, res: Response) => {});
