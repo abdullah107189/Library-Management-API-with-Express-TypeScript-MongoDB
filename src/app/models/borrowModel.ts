@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 import { IBorrow } from "../interfaces/borrowInterface";
 
 const borrowSchema = new Schema<IBorrow>(
@@ -12,3 +12,4 @@ const borrowSchema = new Schema<IBorrow>(
     versionKey: false,
   }
 );
+export const Borrows = model("Borrows", borrowSchema);

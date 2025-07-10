@@ -18,10 +18,10 @@ const bookSchema = new Schema<IBook>(
       ],
     },
     isbn: { type: String, required: true, unique: true },
-    description: String,
+    description: { type: String },
     copies: {
       type: Number,
-      min: [0, "Not allow negative number"],
+      min: [0, "Copies must be a positive number"],
       required: true,
     },
     available: { type: Boolean, default: true },
@@ -32,4 +32,4 @@ const bookSchema = new Schema<IBook>(
   }
 );
 
-export const Book = model("Books", bookSchema);
+export const Books = model("Books", bookSchema);
