@@ -37,7 +37,6 @@ bookRouter.get("/", async (req: Request, res: Response) => {
     const rawLimit = query.limit as string;
     const limitNumber = Number(rawLimit);
 
-
     const result = await Books.find(filterObj)
       .sort({ [sortBy]: sortValue })
       .limit(limitNumber);
@@ -45,6 +44,24 @@ bookRouter.get("/", async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Books retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Fetching books failed",
+      error: error,
+    });
+  }
+});
+
+bookRouter.get("/:bookId", async (req: Request, res: Response) => {
+  try {
+    const { bookId } = req.params;
+    const result = await Books.findById(bookId);
+    res.status(200).json({
+      success: true,
+      message: "Book retrieved successfully",
       data: result,
     });
   } catch (error) {
