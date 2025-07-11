@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { IBook } from "../interfaces/bookInterface";
+import { IBook, IBookMethod } from "../interfaces/bookInterface";
 
 const bookSchema = new Schema<IBook>(
   {
@@ -31,5 +31,15 @@ const bookSchema = new Schema<IBook>(
     versionKey: false,
   }
 );
-
-export const Books = model("Books", bookSchema);
+bookSchema.statics.removeCopies = async function (bookId, quantity) {
+  const book = await this.findById(bookId);
+  if (!book) {
+    throw new Error("Book not found while removing copies");
+  }
+  const availableCopies = Math.max(0, book.copies - quantity);
+  book.copies = availableCopies;
+  book.available = availableCopies > 0 ? true : false;
+  await book.save();
+  return book;
+};
+export const Books = model<IBook, IBookMethod>("Books", bookSchema);
