@@ -94,4 +94,27 @@ bookRouter.patch("/:bookId", async (req: Request, res: Response) => {
 });
 
 // delete book route
-bookRouter.delete("/", async (req: Request, res: Response) => {});
+bookRouter.delete("/:bookId", async (req: Request, res: Response) => {
+  try {
+    const { bookId } = req.params;
+    const result = await Books.findByIdAndDelete(bookId);
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "Book not found",
+        data: null,
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Book deleted successfully",
+      data: null,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete the book",
+      error: error,
+    });
+  }
+});
