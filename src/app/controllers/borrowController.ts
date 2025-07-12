@@ -57,6 +57,51 @@ borrowRouter.post("/", async (req: Request, res: Response) => {
     });
   }
 });
-borrowRouter.get("/", async (req: Request, res: Response) => {});
+
+borrowRouter.get("/", async (req: Request, res: Response) => {
+  try {
+    const result = await Borrows.aggregate([
+      // stage 1
+      {
+        $group: {
+          _id: "$book",
+          totalQuantity: { $sum: 1 },
+        },
+      },
+      // stage 2
+      {
+        $lookup: {
+          from: "books",
+          localField: "_id",
+          foreignField: "_id",
+          as: "bookInfo",
+        },
+      },
+      // stage 3
+      { $unwind: "$bookInfo" },
+      {
+        $project: {
+          _id : 0,
+          book: {
+            title: "$bookInfo.title",
+            isbn: "$bookInfo.isbn",
+          },
+          totalQuantity: 1,
+        },
+      },
+    ]);
+    res.status(200).json({
+      success: true,
+      message: "Borrowed books summary retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    res.status(200).json({
+      success: false,
+      message: "Borrowed books summary retrieving error",
+      error: error,
+    });
+  }
+});
 borrowRouter.patch("/", async (req: Request, res: Response) => {});
 borrowRouter.delete("/", async (req: Request, res: Response) => {});
