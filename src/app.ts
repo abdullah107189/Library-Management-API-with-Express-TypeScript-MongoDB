@@ -6,7 +6,7 @@ const app: Application = express();
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send(`<h1>It's working bro 😀</h1>`);
+  res.status(200).send("API is running smoothly.");
 });
 
 app.use("/api/books", bookRouter);
