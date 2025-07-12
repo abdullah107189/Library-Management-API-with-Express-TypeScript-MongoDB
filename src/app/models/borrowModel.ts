@@ -23,4 +23,12 @@ borrowSchema.post("save", async function (doc, next) {
     next(error as Error);
   }
 });
+borrowSchema.pre("save", async function (next) {
+  try {
+    console.log("creating borrow...")
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
+});
 export const Borrows = model("Borrows", borrowSchema);

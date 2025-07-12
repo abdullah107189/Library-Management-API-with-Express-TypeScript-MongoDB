@@ -21,7 +21,7 @@ bookRouter.post("/", async (req: Request, res: Response) => {
   }
 });
 
-// find book route
+// find book route using by sort + sortby + filter + limit 
 bookRouter.get("/", async (req: Request, res: Response) => {
   try {
     const query = req.query;

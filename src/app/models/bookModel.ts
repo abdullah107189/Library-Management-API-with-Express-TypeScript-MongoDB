@@ -42,4 +42,10 @@ bookSchema.statics.removeCopies = async function (bookId, quantity) {
   await book.save();
   return book;
 };
+
+bookSchema.pre("save", function (next) {
+  this.available = this.copies > 0;
+  next();
+});
+
 export const Books = model<IBook, IBookMethod>("Books", bookSchema);
