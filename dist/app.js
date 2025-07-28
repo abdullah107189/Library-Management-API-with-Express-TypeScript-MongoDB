@@ -10,7 +10,7 @@ const borrowController_1 = require("./app/controllers/borrowController");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.get("/", (req, res) => {
-    res.send(`<h1>It's working bro 😀</h1>`);
+    res.status(200).send("API is running smoothly.");
 });
 app.use("/api/books", bookController_1.bookRouter);
 app.use("/api/borrow", borrowController_1.borrowRouter);

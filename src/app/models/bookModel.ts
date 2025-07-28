@@ -25,6 +25,7 @@ const bookSchema = new Schema<IBook>(
       required: true,
     },
     available: { type: Boolean, default: true },
+    image: { type: String, required: true },
   },
   {
     timestamps: true,

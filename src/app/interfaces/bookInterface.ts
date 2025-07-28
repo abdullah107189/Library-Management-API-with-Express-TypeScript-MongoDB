@@ -14,6 +14,7 @@ export interface IBook extends Document {
   description?: string;
   copies: number;
   available?: boolean;
+  image: string;
 }
 
 export interface IBookMethod extends Model<IBook> {
