@@ -65,7 +65,7 @@ borrowRouter.get("/", async (req: Request, res: Response) => {
       {
         $group: {
           _id: "$book",
-          totalQuantity: { $sum: 1 },
+          totalQuantity: { $sum: "$quantity" },
         },
       },
       // stage 2
@@ -81,7 +81,7 @@ borrowRouter.get("/", async (req: Request, res: Response) => {
       { $unwind: "$bookInfo" },
       {
         $project: {
-          _id : 0,
+          _id: 0,
           book: {
             title: "$bookInfo.title",
             isbn: "$bookInfo.isbn",

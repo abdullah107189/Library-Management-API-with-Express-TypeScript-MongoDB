@@ -25,7 +25,7 @@ borrowSchema.post("save", async function (doc, next) {
 });
 borrowSchema.pre("save", async function (next) {
   try {
-    console.log("creating borrow...")
+    console.log("creating borrow...");
     next();
   } catch (error) {
     next(error as Error);

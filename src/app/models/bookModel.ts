@@ -32,6 +32,7 @@ const bookSchema = new Schema<IBook>(
     versionKey: false,
   }
 );
+
 bookSchema.statics.removeCopies = async function (bookId, quantity) {
   const book = await this.findById(bookId);
   if (!book) {
@@ -43,6 +44,7 @@ bookSchema.statics.removeCopies = async function (bookId, quantity) {
   await book.save();
   return book;
 };
+
 
 bookSchema.pre("save", function (next) {
   this.available = this.copies > 0;
