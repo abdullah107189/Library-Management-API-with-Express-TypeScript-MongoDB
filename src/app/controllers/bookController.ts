@@ -21,23 +21,31 @@ bookRouter.post("/", async (req: Request, res: Response) => {
   }
 });
 
-// find book route using by sort + sortby + filter + limit
 bookRouter.get("/", async (req: Request, res: Response) => {
   try {
-    const query = req.query;
-    const filter = query.filter as string;
-    const filterObj = filter ? { genre: filter } : {};
+    const { searchTerm, genreFilter, availabilityFilter, limit } = req.query;
 
-    const rawSortBy = query.sortBy as string;
-    let sortBy = rawSortBy || "createdAt";
-    const rawSort = query.sort as string;
-    const sortValue = rawSort === "desc" ? -1 : 1;
+    // Build filter object
+    const filterObj: any = {};
+    if (genreFilter && genreFilter !== "all") {
+      filterObj.genre = genreFilter;
+    }
+    if (availabilityFilter && availabilityFilter !== "all") {
+      filterObj.available = availabilityFilter === "available";
+    }
+    if (searchTerm) {
+      filterObj.$or = [
+        { title: { $regex: searchTerm, $options: "i" } },
+        { author: { $regex: searchTerm, $options: "i" } },
+        { genre: { $regex: searchTerm, $options: "i" } },
+      ];
+    }
 
-    const rawLimit = query.limit as string;
-    const limitNumber = Number(rawLimit);
+    // Limit
+    const limitNumber = Number(limit) || 10;
 
     const result = await Books.find(filterObj)
-      .sort({ [sortBy]: sortValue })
+      // .sort({ [sortField]: sortValue })
       .limit(limitNumber);
 
     res.status(200).json({
@@ -49,11 +57,10 @@ bookRouter.get("/", async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       message: "Fetching books failed",
-      error: error,
+      error,
     });
   }
 });
-
 bookRouter.get("/:bookId", async (req: Request, res: Response) => {
   try {
     const { bookId } = req.params;
