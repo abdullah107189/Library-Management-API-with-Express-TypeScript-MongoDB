@@ -35,32 +35,46 @@ exports.bookRouter.post("/", (req, res) => __awaiter(void 0, void 0, void 0, fun
         });
     }
 }));
-// find book route using by sort + sortby + filter + limit 
 exports.bookRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const query = req.query;
-        const filter = query.filter;
-        const filterObj = filter ? { genre: filter } : {};
-        const rawSortBy = query.sortBy;
-        let sortBy = rawSortBy || "createdAt";
-        const rawSort = query.sort;
-        const sortValue = rawSort === "desc" ? -1 : 1;
-        const rawLimit = query.limit;
-        const limitNumber = Number(rawLimit);
-        const result = yield bookModel_1.Books.find(filterObj)
-            .sort({ [sortBy]: sortValue })
-            .limit(limitNumber);
+        const { searchTerm, genreFilter, availabilityFilter, limit, page } = req.query;
+        // Build filter object
+        const filterObj = {};
+        if (genreFilter && genreFilter !== "all") {
+            filterObj.genre = genreFilter;
+        }
+        if (availabilityFilter && availabilityFilter !== "all") {
+            filterObj.available = availabilityFilter === "available";
+        }
+        if (searchTerm) {
+            filterObj.$or = [
+                { title: { $regex: searchTerm, $options: "i" } },
+                { author: { $regex: searchTerm, $options: "i" } },
+                { genre: { $regex: searchTerm, $options: "i" } },
+            ];
+        }
+        // Limit
+        const pageNumber = Number(page) || 1;
+        const limitNumber = Number(limit) || 10;
+        const skip = (pageNumber - 1) * limitNumber;
+        const [books, total] = yield Promise.all([
+            bookModel_1.Books.find(filterObj).skip(skip).limit(limitNumber),
+            bookModel_1.Books.countDocuments(filterObj),
+        ]);
         res.status(200).json({
             success: true,
             message: "Books retrieved successfully",
-            data: result,
+            data: books,
+            meta: {
+                totalPages: Math.ceil(total / limitNumber),
+            },
         });
     }
     catch (error) {
         res.status(500).json({
             success: false,
             message: "Fetching books failed",
-            error: error,
+            error,
         });
     }
 }));
@@ -83,7 +97,7 @@ exports.bookRouter.get("/:bookId", (req, res) => __awaiter(void 0, void 0, void 
     }
 }));
 // update book route
-exports.bookRouter.patch("/:bookId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.bookRouter.put("/:bookId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { bookId } = req.params;
         const update = req.body;

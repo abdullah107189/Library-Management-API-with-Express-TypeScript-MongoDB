@@ -84,7 +84,7 @@ exports.borrowRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, fu
             {
                 $group: {
                     _id: "$book",
-                    totalQuantity: { $sum: 1 },
+                    totalQuantity: { $sum: "$quantity" },
                 },
             },
             // stage 2

@@ -7,8 +7,12 @@ require("dotenv").config();
 const express_1 = __importDefault(require("express"));
 const bookController_1 = require("./app/controllers/bookController");
 const borrowController_1 = require("./app/controllers/borrowController");
+const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+app.use((0, cors_1.default)({
+    origin: ["http://localhost:5173", "live-deploy-url"],
+}));
 app.get("/", (req, res) => {
     res.status(200).send("API is running smoothly.");
 });
