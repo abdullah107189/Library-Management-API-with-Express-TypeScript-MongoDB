@@ -23,7 +23,8 @@ bookRouter.post("/", async (req: Request, res: Response) => {
 
 bookRouter.get("/", async (req: Request, res: Response) => {
   try {
-    const { searchTerm, genreFilter, availabilityFilter, limit } = req.query;
+    const { searchTerm, genreFilter, availabilityFilter, limit, page } =
+      req.query;
 
     // Build filter object
     const filterObj: any = {};
@@ -42,16 +43,22 @@ bookRouter.get("/", async (req: Request, res: Response) => {
     }
 
     // Limit
+    const pageNumber = Number(page) || 1;
     const limitNumber = Number(limit) || 10;
+    const skip = (pageNumber - 1) * limitNumber;
 
-    const result = await Books.find(filterObj)
-      // .sort({ [sortField]: sortValue })
-      .limit(limitNumber);
+    const [books, total] = await Promise.all([
+      Books.find(filterObj).skip(skip).limit(limitNumber),
+      Books.countDocuments(filterObj),
+    ]);
 
     res.status(200).json({
       success: true,
       message: "Books retrieved successfully",
-      data: result,
+      data: books,
+      meta: {
+        totalPages: Math.ceil(total / limitNumber),
+      },
     });
   } catch (error) {
     res.status(500).json({
